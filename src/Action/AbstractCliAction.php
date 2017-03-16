@@ -10,9 +10,10 @@
 namespace ObjectivePHP\Cli\Action;
 
 
-use ObjectivePHP\Application\Action\Parameter\Cli\Argument;
-use ObjectivePHP\Application\Action\Parameter\Cli\Exception;
-use ObjectivePHP\Application\Action\Parameter\Cli\ParameterInterface;
+use ObjectivePHP\Cli\Action\Parameter\Argument;
+use ObjectivePHP\Cli\Action\Parameter\Exception;
+use ObjectivePHP\Cli\Action\Parameter\ParameterException;
+use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Invokable\InvokableInterface;
@@ -47,7 +48,7 @@ abstract class AbstractCliAction implements CliActionInterface
         
         if (!$app instanceof ApplicationInterface)
         {
-            throw new Exception('Action must be invoked with an ApplicationInterface instance as first parameter');
+            throw new CliActionException('Action must be invoked with an ApplicationInterface instance as first parameter');
         }
         
         
@@ -84,7 +85,7 @@ abstract class AbstractCliAction implements CliActionInterface
         
             if ($lastArgument && !($lastArgument->getOptions() & ParameterInterface::MANDATORY))
             {
-                throw new Exception(sprintf('It is forbidden to expect a mandatory parameter (%s) after an optional one (%s)', $parameter->getLongName(), $expectedParameter->getLongName()));
+                throw new ParameterException(sprintf('It is forbidden to expect a mandatory parameter (%s) after an optional one (%s)', $parameter->getLongName(), $expectedParameter->getLongName()));
             }
         }
         
@@ -92,7 +93,7 @@ abstract class AbstractCliAction implements CliActionInterface
         {
             if(isset($this->expectedParameters[$shortName]))
             {
-                throw new Exception(sprintf('Parameter "%s" has already been registered', $shortName));
+                throw new ParameterException(sprintf('Parameter "%s" has already been registered', $shortName));
             }
             
             $this->expectedParameters[$shortName] = $parameter;
@@ -102,7 +103,7 @@ abstract class AbstractCliAction implements CliActionInterface
         {
             if (isset($this->expectedParameters[$longName]))
             {
-                throw new Exception(sprintf('Parameter "%s" has already been registered', $longName));
+                throw new ParameterException(sprintf('Parameter "%s" has already been registered', $longName));
             }
         
             $this->expectedParameters[$longName] = $parameter;
@@ -123,7 +124,7 @@ abstract class AbstractCliAction implements CliActionInterface
         $expectedParameters = $this->getExpectedParameters();
         $handledParameters = [];
         
-        /** @var \ObjectivePHP\Application\Action\Parameter\Cli\ParameterInterface $parameter */
+        /** @var \ObjectivePHP\Cli\Action\Parameter\ParameterInterface $parameter */
         foreach ($expectedParameters as $parameter)
         {
             if(in_array($parameter, $handledParameters)) continue;

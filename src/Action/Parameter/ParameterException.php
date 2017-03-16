@@ -10,7 +10,9 @@
 namespace ObjectivePHP\Cli\Action\Parameter;
 
 
-class Exception extends \ObjectivePHP\Application\Action\Exception
+use ObjectivePHP\Cli\Action\CliActionException;
+
+class ParameterException extends CliActionException
 {
     
 }
