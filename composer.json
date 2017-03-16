@@ -1,0 +1,26 @@
+{
+    "name": "objective-php/cli",
+    "description": "Cli commands handling library",
+    "type": "library",
+    "require": {
+        "league/climate": "^3.2",
+        "objective-php/message": "dev-master as 0.9.5",
+        "objective-php/router": "^1.0",
+        "objective-php/application": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.0"
+    },
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Gauthier 'Rusty' Delamarre",
+            "email": "gauthier@objective-php.org"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ObjectivePHP\\Cli\\": "src/"
+        }
+    }
+}
