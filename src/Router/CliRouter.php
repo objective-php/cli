@@ -35,7 +35,7 @@ class CliRouter implements RouterInterface
             {
                 if (is_string($command))
                 {
-                    if (class_exis  ts($command))
+                    if (class_exists($command))
                     {
                         $command = new $command($app);
                     }
