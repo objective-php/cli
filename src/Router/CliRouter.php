@@ -10,13 +10,14 @@
 namespace ObjectivePHP\Cli\Router;
 
 
+use ObjectivePHP\Cli\Action\CliActionException;
 use ObjectivePHP\Cli\Action\CliActionInterface;
 use ObjectivePHP\Cli\Action\Parameter\Argument;
-use ObjectivePHP\Cli\Action\Parameter\Exception;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Cli\Request\CliRequest;
 use ObjectivePHP\Cli\Request\Parameter\Container\CliParameterContainer;
+use ObjectivePHP\Router\MatchedRoute;
 use ObjectivePHP\Router\RouterInterface;
 use ObjectivePHP\Router\RoutingResult;
 
@@ -34,19 +35,19 @@ class CliRouter implements RouterInterface
             {
                 if (is_string($command))
                 {
-                    if (class_exists($command))
+                    if (class_exis  ts($command))
                     {
                         $command = new $command($app);
                     }
                     else
                     {
-                        throw new Exception('Unknown CLI command registered');
+                        throw new CliActionException('Unknown CLI command registered');
                     }
                 }
                 
                 if (!$command instanceof CliActionInterface)
                 {
-                    throw new Exception('Invalid CLI command registered');
+                    throw new CliActionException('Invalid CLI command registered');
                 }
                 
                 if ($command->getCommand() == $requestedCommand)
