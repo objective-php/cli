@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "68bfe8e0def44bf0cd90fafb9cfe1fe0",
-    "content-hash": "3083e1269d44156b97f51caa8d7035f4",
+    "hash": "be1a7e71c86c14fbbb73c94dd72c831b",
+    "content-hash": "3bc2d29e5ac4fb76835c01e899ef0a81",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -299,28 +299,29 @@
         },
         {
             "name": "objective-php/application",
-            "version": "v1.0.6",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/application.git",
-                "reference": "4189f75522955f021396f1f538ec82689229f189"
+                "reference": "c18769b67c51191a939c8b057bfbd3a6cf155b50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/objective-php/application/zipball/4189f75522955f021396f1f538ec82689229f189",
-                "reference": "4189f75522955f021396f1f538ec82689229f189",
+                "url": "https://api.github.com/repos/objective-php/application/zipball/c18769b67c51191a939c8b057bfbd3a6cf155b50",
+                "reference": "c18769b67c51191a939c8b057bfbd3a6cf155b50",
                 "shasum": ""
             },
             "require": {
-                "objective-php/components": "1.*",
-                "objective-php/data-processor": "1.0.*",
-                "objective-php/events-handler": "1.0.*",
-                "objective-php/html": "1.*",
-                "objective-php/message": "0.9.*",
-                "objective-php/services-factory": "1.0.*",
+                "objective-php/components": "^1.0.0",
+                "objective-php/data-processor": "~1.0.0",
+                "objective-php/events-handler": "~1.0.0",
+                "objective-php/html": "^1.0",
+                "objective-php/message": "~1.0.0",
+                "objective-php/services-factory": "~1.0.0",
                 "php": ">=7.0"
             },
             "require-dev": {
+                "objective-php/router": "~1.0.0",
                 "phpunit/phpunit": "5.*"
             },
             "type": "framework",
@@ -346,7 +347,7 @@
                 "framework",
                 "objective php"
             ],
-            "time": "2017-01-17 11:43:40"
+            "time": "2017-03-17 10:18:52"
         },
         {
             "name": "objective-php/components",
@@ -689,7 +690,7 @@
         },
         {
             "name": "objective-php/message",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/objective-php/message.git",
@@ -2497,18 +2498,9 @@
             "time": "2017-03-07 16:47:02"
         }
     ],
-    "aliases": [
-        {
-            "alias": "0.9.5",
-            "alias_normalized": "0.9.5.0",
-            "version": "9999999-dev",
-            "package": "objective-php/message"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "objective-php/message": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
