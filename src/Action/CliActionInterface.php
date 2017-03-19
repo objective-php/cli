@@ -12,12 +12,25 @@ namespace ObjectivePHP\Cli\Action;
 
 use ObjectivePHP\Invokable\InvokableInterface;
 
+/**
+ * Interface CliActionInterface
+ * @package ObjectivePHP\Cli\Action
+ */
 interface CliActionInterface extends InvokableInterface
 {
+    /**
+     * @return array
+     */
     public function getExpectedParameters();
-    
+
+    /**
+     * @return string
+     */
     public function getCommand() : string;
-    
+
+    /**
+     * @return string
+     */
     public function getUsage() : string;
     
 }

@@ -45,8 +45,7 @@ class Argument extends AbstractParameter
             unset($argv[0]);
         }
         
-        
-        
+
         return array_values($argv);
     }
     

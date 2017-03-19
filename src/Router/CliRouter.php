@@ -10,27 +10,52 @@
 namespace ObjectivePHP\Cli\Router;
 
 
+use League\CLImate\CLImate;
 use ObjectivePHP\Cli\Action\CliActionException;
 use ObjectivePHP\Cli\Action\CliActionInterface;
 use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Application\ApplicationInterface;
+use ObjectivePHP\Cli\Action\Usage;
 use ObjectivePHP\Cli\Request\CliRequest;
 use ObjectivePHP\Cli\Request\Parameter\Container\CliParameterContainer;
 use ObjectivePHP\Router\MatchedRoute;
 use ObjectivePHP\Router\RouterInterface;
 use ObjectivePHP\Router\RoutingResult;
 
+/**
+ * Class CliRouter
+ * @package ObjectivePHP\Cli\Router
+ */
 class CliRouter implements RouterInterface
 {
     protected $registeredCommands = [];
-    
+
+
+    /**
+     * CliRouter constructor.
+     */
+    public function __construct()
+    {
+        $this->registerCommand((new Usage)->setRouter($this));
+    }
+
+
+    /**
+     * @param ApplicationInterface $app
+     * @return RoutingResult
+     * @throws CliActionException
+     */
     public function route(ApplicationInterface $app): RoutingResult
     {
         if ($app->getRequest() instanceof CliRequest)
         {
             $requestedCommand = ltrim($app->getRequest()->getRoute());
-            
+
+            route:
+            // redirect to usage if no command has been provided
+            if(!$requestedCommand) $requestedCommand = 'usage';
+
             foreach ($this->registeredCommands as $command)
             {
                 if (is_string($command))
@@ -62,7 +87,8 @@ class CliRouter implements RouterInterface
                     array_shift($argv); // remove command
                     $handledParameters = [];
                     $arguments = [];
-                    
+                    $c = new CLImate();
+
                     /** @var ParameterInterface $parameter */
                     foreach($command->getExpectedParameters() as $parameter)
                     {
@@ -100,8 +126,7 @@ class CliRouter implements RouterInterface
                             }
                         } else if($parameter->getOptions() & ParameterInterface::MANDATORY)
                         {
-                            printf("Mandatory parameter '%s' is missing", $parameter->getLongName() ?: $parameter->getShortName());
-                            echo PHP_EOL;
+                            $c->error(sprintf('Mandatory parameter "%s" is missing', $parameter->getLongName() ?: $parameter->getShortName()));
                             die($command->getUsage());
                         }
                         
@@ -114,7 +139,7 @@ class CliRouter implements RouterInterface
                     {
                         if (strpos($argument, '-') === 0)
                         {
-                            echo sprintf('Unexpected parameter: %s' . PHP_EOL, $argument);
+                            $c->out(sprintf('Unexpected parameter "<error>%s</error>"', $argument));
                             echo $command->getUsage();
                             exit;
                         }
@@ -127,9 +152,11 @@ class CliRouter implements RouterInterface
                         $value = $argument->getValue();
                         if (!$value && ($argument->getOptions() & Argument::MANDATORY))
                         {
-                            printf("Mandatory parameter '%s' is missing", $parameter->getLongName() ?: $parameter->getShortName());
-                            echo PHP_EOL;
-                            die($command->getUsage());
+                            $c->out(sprintf('Mandatory argument "<error>%s</error>" is missing', $argument->getLongName()));
+                            $c->br();
+                            echo $command->getUsage();
+                            $c->br();
+                            exit;
                         }
                         $cliParameters[$argument->getLongName()] = $value;
                     }
@@ -137,12 +164,28 @@ class CliRouter implements RouterInterface
                     $parameters->setCli($cliParameters);
                     return new RoutingResult(new MatchedRoute($this, $command->getCommand(), $command));
                 }
+
             }
+
+            // looks like no command matched...
+            // redirect to 'usage' command while keeping original requested command in Request
+            $requestedCommand = 'usage';
+            goto route;
         }
-        
+
         return new RoutingResult();
+
     }
-    
+
+    /**
+     * @return array
+     */
+    public function getRegisteredCommands(): array
+    {
+        return $this->registeredCommands;
+    }
+
+
     public function url($route, $params = [])
     {
         // TODO: Implement url() method.
@@ -151,8 +194,7 @@ class CliRouter implements RouterInterface
     public function registerCommand($command)
     {
         $this->registeredCommands[] = $command;
-        $this->registeredCommands   = array_unique($this->registeredCommands);
-        
+
         return $this;
     }
 }
