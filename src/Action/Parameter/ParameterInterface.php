@@ -13,9 +13,8 @@ namespace ObjectivePHP\Cli\Action\Parameter;
 interface ParameterInterface
 {
     
-    const MULTIPLE = 1;
-    const MANDATORY = 2;
-    const SWITCH = 4;
+    const MANDATORY = 1;
+    const MULTIPLE = 2;
     
     public function getDescription() : string;
     

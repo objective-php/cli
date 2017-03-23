@@ -24,8 +24,6 @@ abstract class AbstractParameter implements ParameterInterface
     
     protected $description;
     
-    protected $tokens = [' ' => '_*_*SPACE*_*_'];
-    
     public function __construct($name, $description = '', $options = 0)
     {
         $this->setName($name);
@@ -77,7 +75,7 @@ abstract class AbstractParameter implements ParameterInterface
     
             if (strlen($shortName) !== 1)
             {
-                throw new Exception('Short parameters name has to be exactly one character long');
+                throw new ParameterException('Short parameters name has to be exactly one character long');
             }
             
             $this->shortName = $shortName;
@@ -141,34 +139,5 @@ abstract class AbstractParameter implements ParameterInterface
         $this->description = $description;
         
         return $this;
-    }
-    
-    protected function tokenize($string) : string
-    {
-        $string = new Str($string);
-        foreach($this->tokens as $characterPattern => $token)
-        {
-            $pattern = '/((["\']).*?(' . $characterPattern . ').*?(?:\\2))/';
-            if(preg_match_all($pattern, $string, $matches))
-            {
-                foreach($matches[0] as $i => $match)
-                {
-                    $string->replace($match, preg_replace('/' . $characterPattern . '/', $token, $match));
-                }
-            }
-        }
-        
-        return (string) $string;
-    }
-    
-    protected function untokenize($string) : string
-    {
-        $string = new Str($string);
-        foreach ($this->tokens as $characterPattern => $token)
-        {
-            $string->replace($token, $characterPattern);
-        }
-        
-        return (string) $string;
     }
 }

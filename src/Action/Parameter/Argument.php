@@ -36,8 +36,16 @@ class Argument extends AbstractParameter
     public function hydrate(array $argv): array
     {
         $value = null;
+     
         
-        // look for long name occurrences
+        if($this->getOptions() & self::MULTIPLE)
+        {
+            // assign all remaining arguments to the current one
+            $this->setValue($argv);
+            return [];
+        }
+        
+        // assign first positional argument to current one
         if (isset($argv[0]))
         {
             $this->setValue($argv[0]);

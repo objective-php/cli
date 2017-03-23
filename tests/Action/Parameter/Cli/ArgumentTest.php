@@ -18,14 +18,14 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataForTestHydration
      */
-    public function testHydration($argv, $name, $expectedValue, $remainingArgv)
+    public function testHydration($argv, $name, $options, $expectedValue, $remainingArgv)
     {
         if ($expectedValue instanceof \Exception)
         {
             $this->expectException($expectedValue);
         }
         
-        $param = new Argument($name);
+        $param = new Argument($name, '', $options);
         
         $cliAfterHydration = $param->hydrate($argv);
         
@@ -37,7 +37,8 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
     {
         return
             [
-                [['filename.php', 'other'], 'file', 'filename.php', ['other']],
+                [['filename.php', 'other'], ['f' => 'file'], 0, 'filename.php', ['other']],
+                [['filename.php', 'other.php'], 'file', Argument::MULTIPLE, ['filename.php', 'other.php'], []],
             ];
     }
     
