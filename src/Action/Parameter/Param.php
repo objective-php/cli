@@ -18,6 +18,38 @@ class Param extends AbstractParameter
     {
         $multiple = $this->getOptions() & self::MULTIPLE;
         $value    = $multiple ? [] : '';
+    
+        // look for short name occurrences
+        if ($short = $this->getShortName())
+        {
+            foreach ($argv as $i => $arg)
+            {
+                if (strpos($arg, '-' . $short . '=') === 0)
+                {
+                    if ($multiple)
+                    {
+                        $value[] = explode('=', $arg, 2)[1];
+                    }
+                    else $value = explode('=', $arg, 2)[1];
+                
+                    unset($argv[$i]);
+                }
+                elseif ($arg == '-' . $short)
+                {
+                    if (!isset($argv[$i + 1]))
+                    {
+                        throw new ParameterException(sprintf('Missing value for parameter "-%s"', $short));
+                    }
+                    if ($multiple)
+                    {
+                        $value[] = $argv[$i + 1];
+                    }
+                    else $value = $argv[$i + 1];
+                    unset($argv[$i], $argv[$i + 1]);
+                }
+            }
+        
+        }
         
         // look for long name occurrences
         if ($long = $this->getLongName())
@@ -38,7 +70,7 @@ class Param extends AbstractParameter
                 {
                     if (!isset($argv[$i + 1]))
                     {
-                        throw new Exception(sprintf('Missing value for parameter "--%s"', $long));
+                        throw new ParameterException(sprintf('Missing value for parameter "--%s"', $long));
                     }
                     if ($multiple)
                     {
@@ -49,37 +81,6 @@ class Param extends AbstractParameter
                     unset($argv[$i], $argv[$i + 1]);
                 }
             }
-        }
-        // look for short name occurrences
-        if ($short = $this->getShortName())
-        {
-            foreach ($argv as $i => $arg)
-            {
-                if (strpos($arg, '-' . $short . '=') === 0)
-                {
-                    if ($multiple)
-                    {
-                        $value[] = explode('=', $arg, 2)[1];
-                    }
-                    else $value = explode('=', $arg, 2)[1];
-                    
-                    unset($argv[$i]);
-                }
-                elseif ($arg == '-' . $short)
-                {
-                    if (!isset($argv[$i + 1]))
-                    {
-                        throw new Exception(sprintf('Missing value for parameter "-%s"', $short));
-                    }
-                    if ($multiple)
-                    {
-                        $value[] = $argv[$i + 1];
-                    }
-                    else $value = $argv[$i + 1];
-                    unset($argv[$i], $argv[$i + 1]);
-                }
-            }
-            
         }
         
         $this->setValue($value);

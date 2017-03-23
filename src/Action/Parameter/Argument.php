@@ -35,7 +35,6 @@ class Argument extends AbstractParameter
     
     public function hydrate(array $argv): array
     {
-        
         $value = null;
         
         // look for long name occurrences
@@ -44,7 +43,6 @@ class Argument extends AbstractParameter
             $this->setValue($argv[0]);
             unset($argv[0]);
         }
-        
 
         return array_values($argv);
     }

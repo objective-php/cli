@@ -17,20 +17,7 @@ class Toggle extends AbstractParameter
     public function hydrate(array $argv): array
     {
         $value = 0;
-        // look for long name occurrences
-        if ($long = $this->getLongName())
-        {
-            $pattern = '--' . $long;
-            foreach($argv as $i => $arg)
-            {
-                if ($arg == $pattern)
-                {
-                    $value += 1;
-                    unset($argv[$i]);
-                }
-            }
         
-        }
         // look for short name occurrences
         if ($short = $this->getShortName())
         {
@@ -63,7 +50,21 @@ class Toggle extends AbstractParameter
                 }
             }
         }
+    
+        // look for long name occurrences
+        if ($long = $this->getLongName())
+        {
+            $pattern = '--' . $long;
+            foreach ($argv as $i => $arg)
+            {
+                if ($arg == $pattern)
+                {
+                    $value += 1;
+                    unset($argv[$i]);
+                }
+            }
         
+        }
         
         $this->setValue($value);
         
