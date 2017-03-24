@@ -5,7 +5,7 @@ $cwd = getcwd();
 // define bootstrap path
 if(file_exists('.op.cli'))
 {
-    $bootstrap = file_get_contents('.op.cli');
+    $bootstrap = trim(file_get_contents('.op.cli'));
     goto bootstrap;
 }
 
@@ -16,7 +16,7 @@ while($path = realpath('..'))
     {
         if($entry->isFile() && $entry->getBasename() == '.op.cli')
         {
-            $bootstrap = file_get_contents($entry->getFilename());
+            $bootstrap = trim(file_get_contents($entry->getFilename()));
             goto bootstrap;
         }
     }
