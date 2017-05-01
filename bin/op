@@ -16,7 +16,7 @@ while($path = realpath('..'))
     {
         if($entry->isFile() && $entry->getBasename() == '.op.cli')
         {
-            $bootstrap = trim(file_get_contents($entry->getFilename()));
+            $bootstrap = file_get_contents($entry->getFilename());
             goto bootstrap;
         }
     }

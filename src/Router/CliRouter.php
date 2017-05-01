@@ -135,13 +135,13 @@ class CliRouter implements RouterInterface
                     
                     
                     // look for unexpected params or toggles
-                    foreach($argv as $argument)
-                    {
-                        if (strpos($argument, '-') === 0)
-                        {
-                            $c->out(sprintf('Unexpected parameter "<error>%s</error>"', $argument));
-                            echo $command->getUsage();
-                            exit;
+                    if(!$command->areUnexpectedParametersAllowed()) {
+                        foreach ($argv as $argument) {
+                            if (strpos($argument, '-') === 0) {
+                                $c->out(sprintf('Unexpected parameter "<error>%s</error>"', $argument));
+                                echo $command->getUsage();
+                                exit;
+                            }
                         }
                     }
                     

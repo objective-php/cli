@@ -32,5 +32,10 @@ interface CliActionInterface extends InvokableInterface
      * @return string
      */
     public function getUsage() : string;
+
+    /**
+     * @return bool
+     */
+    public function areUnexpectedParametersAllowed() : bool;
     
 }

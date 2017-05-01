@@ -58,6 +58,11 @@ abstract class AbstractCliAction implements CliActionInterface
     protected $description = '';
 
     /**
+     * @var bool
+     */
+    protected $allowUnexpectedParameters = false;
+
+    /**
      * @param array $args
      *
      * @return mixed
@@ -337,4 +342,20 @@ abstract class AbstractCliAction implements CliActionInterface
      * @return mixed
      */
     abstract public function run(ApplicationInterface $app);
+
+    /**
+     * @return bool
+     */
+    public function areUnexpectedParametersAllowed(): bool
+    {
+        return $this->allowUnexpectedParameters;
+    }
+
+    /**
+     * @param bool $allowUnexpectedParameters
+     */
+    public function allowUnexpectedParameters(bool $allowUnexpectedParameters = true)
+    {
+        $this->allowUnexpectedParameters = $allowUnexpectedParameters;
+    }
 }
