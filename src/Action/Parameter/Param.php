@@ -18,70 +18,82 @@ class Param extends AbstractParameter
     {
         $multiple = $this->getOptions() & self::MULTIPLE;
         $value    = $multiple ? [] : '';
-    
+        $args     = $argv;
+        $length   = count($args);
+        
         // look for short name occurrences
-        if ($short = $this->getShortName())
-        {
-            foreach ($argv as $i => $arg)
-            {
-                if (strpos($arg, '-' . $short . '=') === 0)
-                {
-                    if ($multiple)
-                    {
-                        $value[] = explode('=', $arg, 2)[1];
-                    }
-                    else $value = explode('=', $arg, 2)[1];
+        if ($short = $this->getShortName()) {
+            for ($i = 0; $i < $length; $i++) {
+                $arg = $args[$i];
                 
+                if (strpos($arg, '-' . $short . '=') === 0) {
+                    if ($multiple) {
+                        $value[] = explode('=', $arg, 2)[1];
+                    } else {
+                        $value = explode('=', $arg, 2)[1];
+                    }
                     unset($argv[$i]);
-                }
-                elseif ($arg == '-' . $short)
-                {
-                    if (!isset($argv[$i + 1]))
-                    {
+                    
+                } elseif ($arg === '-' . $short) {
+                    if (!array_key_exists($i + 1, $argv)) {
                         throw new ParameterException(sprintf('Missing value for parameter "-%s"', $short));
                     }
-                    if ($multiple)
-                    {
+                    
+                    if ($multiple) {
                         $value[] = $argv[$i + 1];
+                    } else {
+                        $value = $argv[$i + 1];
                     }
-                    else $value = $argv[$i + 1];
                     unset($argv[$i], $argv[$i + 1]);
+                    
+                    // skip next entry, as it is the value for this param
+                    $i++;
                 }
             }
-        
+            
         }
         
         // look for long name occurrences
-        if ($long = $this->getLongName())
-        {
-            foreach ($argv as $i => $arg)
-            {
-                if (strpos($arg, '--' . $long . '=') === 0)
-                {
-                    if ($multiple)
-                    {
+        if ($long = $this->getLongName()) {
+            $args   = array_values($argv);
+            $length = count($args);
+            
+            for ($i = 0; $i < $length; $i++) {
+                
+                $arg = $args[$i];
+                
+                if (strpos($arg, '--' . $long . '=') === 0) {
+                    if ($multiple) {
                         $value[] = explode('=', $arg, 2)[1];
+                    } else {
+                        $value = explode('=', $arg, 2)[1];
                     }
-                    else $value = explode('=', $arg, 2)[1];
                     
                     unset($argv[$i]);
-                }
-                else if ($arg == '--' . $long)
-                {
-                    if (!isset($argv[$i + 1]))
-                    {
+                    
+                } elseif ($arg === '--' . $long) {
+                    
+                    if (!array_key_exists($i + 1, $argv)) {
+                        if ($long == 'offset') {
+                            var_dump($arg);
+                            var_dump($value);
+                        }
                         throw new ParameterException(sprintf('Missing value for parameter "--%s"', $long));
                     }
-                    if ($multiple)
-                    {
+                    
+                    if ($multiple) {
                         $value[] = $argv[$i + 1];
+                    } else {
+                        $value = $argv[$i + 1];
                     }
-                    else $value = $argv[$i + 1];
                     
                     unset($argv[$i], $argv[$i + 1]);
+                    // skip next entry, as it is the value for this param
+                    $i++;
                 }
             }
         }
+        
         
         $this->setValue($value);
         

@@ -37,7 +37,11 @@ class ParamTest extends \PHPUnit_Framework_TestCase
     {
         return
             [
+                [['-e', 0], 'e', 0, []],
+                [['--long=0'], 'long', 0, []],
+                [['--offset=0', '-e', 0], 'offset', 0, ['-e', 0]],
                 [['-e', 'value1'], 'e', 'value1', []],
+                [['-e=0'], 'e', 0, []],
                 [['-e', 'value1', '-v'], 'e', 'value1', ['-v']],
                 [['--param', 'value1', '-v'], ['p' => 'param'], 'value1', ['-v']],
                 [['--param=value1', '-v'], ['p' => 'param'], 'value1', ['-v']],
