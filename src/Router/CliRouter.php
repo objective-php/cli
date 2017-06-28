@@ -55,116 +55,118 @@ class CliRouter implements RouterInterface
             route:
             // redirect to usage if no command has been provided
             if(!$requestedCommand) $requestedCommand = 'usage';
-
-            foreach ($this->registeredCommands as $command)
-            {
-                if (is_string($command))
-                {
-                    if (class_exists($command))
-                    {
-                        $command = new $command($app);
-                    }
-                    else
-                    {
-                        throw new CliActionException('Unknown CLI command registered');
-                    }
-                }
-                
-                if (!$command instanceof CliActionInterface)
-                {
-                    throw new CliActionException('Invalid CLI command registered');
-                }
-                
-                if ($command->getCommand() == $requestedCommand)
-                {
-                    // init parameters
-                    /** @var CliParameterContainer $parameters */
-                    $parameters = $app->getRequest()->getParameters();
-                    $cliParameters = [];
-                    $argv = $_SERVER['argv'];
-                    
-                    array_shift($argv); // remove script
-                    array_shift($argv); // remove command
-                    $handledParameters = [];
-                    $arguments = [];
-                    $c = new CLImate();
-
-                    /** @var ParameterInterface $parameter */
-                    foreach($command->getExpectedParameters() as $parameter)
-                    {
-                        
-                        // skip aliased parameters that are already handled
-                        if (in_array($parameter, $handledParameters)) continue;
-    
-                        // keep arguments apart - they should be processed last
-                        if($parameter instanceof Argument)
-                        {
-                            $arguments[] = $parameter;
-                            continue;
+            try {
+                foreach ($this->registeredCommands as $command) {
+                    if (is_string($command)) {
+                        if (class_exists($command)) {
+                            $command = new $command($app);
+                        } else {
+                            throw new CliActionException('Unknown CLI command registered');
                         }
-                        
-                        $argv = $parameter->hydrate($argv);
-                        $value = $parameter->getValue();
-                        
-                        if($value)
-                        {
-                            $longName = $parameter->getLongName();
-                            $shortName = $parameter->getShortName();
-                            
-                            if($shortName)
-                            {
-                                $cliParameters[$shortName] = $value;
-                            }
-                            
-                            if($longName && $shortName)
-                            {
-                                $cliParameters[$longName] = &$cliParameters[$shortName];
-                            }
-                            else if($longName)
-                            {
-                                $cliParameters[$longName] = $value;
-                            }
-                        } else if($parameter->getOptions() & ParameterInterface::MANDATORY)
-                        {
-                            $c->error(sprintf('Mandatory parameter "%s" is missing', $parameter->getLongName() ?: $parameter->getShortName()));
-                            die($command->getUsage());
-                        }
-                        
-                        $handledParameters[] = $parameter;
                     }
+        
+                    if (!$command instanceof CliActionInterface) {
+                        throw new CliActionException('Invalid CLI command registered');
+                    }
+        
+                    if ($command->getCommand() == $requestedCommand) {
+                        // init parameters
+                        /** @var CliParameterContainer $parameters */
+                        $parameters    = $app->getRequest()->getParameters();
+                        $cliParameters = [];
+                        $argv          = $_SERVER['argv'];
+            
+                        array_shift($argv); // remove script
+                        array_shift($argv); // remove command
+                        $handledParameters = [];
+                        $arguments         = [];
+                        $c = new CLImate();
+            
+                        /** @var ParameterInterface $parameter */
+                        foreach ($command->getExpectedParameters() as $parameter) {
+                
+                            // skip aliased parameters that are already handled
+                            if (in_array($parameter, $handledParameters)) {
+                                continue;
+                            }
+                
+                            // keep arguments apart - they should be processed last
+                            if ($parameter instanceof Argument) {
+                                $arguments[] = $parameter;
+                                continue;
+                            }
+                
+                            $argv  = $parameter->hydrate($argv);
+                            $value = $parameter->getValue();
+                
+                            if (!is_null($value)) {
+                                $longName  = $parameter->getLongName();
+                                $shortName = $parameter->getShortName();
                     
+                                if ($shortName) {
+                                    $cliParameters[$shortName] = $value;
+                                }
                     
-                    // look for unexpected params or toggles
-                    if(!$command->areUnexpectedParametersAllowed()) {
-                        foreach ($argv as $argument) {
-                            if (strpos($argument, '-') === 0) {
-                                $c->out(sprintf('Unexpected parameter "<error>%s</error>"', $argument));
+                                if ($longName && $shortName) {
+                                    $cliParameters[$longName] = &$cliParameters[$shortName];
+                                } else if ($longName) {
+                                    $cliParameters[$longName] = $value;
+                                }
+                            } else if ($parameter->getOptions() & ParameterInterface::MANDATORY) {
+                                $c->br();
+                                $c->error(sprintf('Mandatory parameter "%s" is missing',
+                                    $parameter->getLongName() ?: $parameter->getShortName()));
+                                $c->br();
                                 echo $command->getUsage();
+                                $c->br();
+                                exit;
+
+                            }
+                
+                            $handledParameters[] = $parameter;
+                        }
+            
+            
+                        // look for unexpected params or toggles
+                        if (!$command->areUnexpectedParametersAllowed()) {
+                            foreach ($argv as $argument) {
+                                if (strpos($argument, '-') === 0) {
+                                    $c->br();
+                                    $c->out(sprintf('Unexpected parameter "<error>%s</error>"', $argument));
+                                    $c->br();
+                                    echo $command->getUsage();
+                                    exit;
+                                }
+                            }
+                        }
+            
+                        /** @var Argument $argument */
+                        foreach ($arguments as $argument) {
+                
+                            $argv  = $argument->hydrate($argv);
+                            $value = $argument->getValue();
+                            if (is_null($value) && ($argument->getOptions() & Argument::MANDATORY)) {
+                                $c->br();
+                                $c->out(sprintf('Mandatory argument "<error>%s</error>" is missing',
+                                    $argument->getLongName()));
+                                $c->br();
+                                echo $command->getUsage();
+                                $c->br();
                                 exit;
                             }
+                            $cliParameters[$argument->getLongName()] = $value;
                         }
+            
+                        $parameters->setCli($cliParameters);
+            
+                        return new RoutingResult(new MatchedRoute($this, $command->getCommand(), $command));
                     }
-                    
-                    /** @var Argument $argument */
-                    foreach($arguments as $argument)
-                    {
-                        $argv = $argument->hydrate($argv);
-                        $value = $argument->getValue();
-                        if (!$value && ($argument->getOptions() & Argument::MANDATORY))
-                        {
-                            $c->out(sprintf('Mandatory argument "<error>%s</error>" is missing', $argument->getLongName()));
-                            $c->br();
-                            echo $command->getUsage();
-                            $c->br();
-                            exit;
-                        }
-                        $cliParameters[$argument->getLongName()] = $value;
-                    }
-                    
-                    $parameters->setCli($cliParameters);
-                    return new RoutingResult(new MatchedRoute($this, $command->getCommand(), $command));
+        
                 }
-
+            } catch(CliActionException $e) {
+                if(empty($c)) $c = new CLImate();
+                $c->out(sprintf('<error>%s</error>', $e->getMessage()));
+                exit;
             }
 
             // looks like no command matched...

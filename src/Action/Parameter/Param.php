@@ -17,7 +17,7 @@ class Param extends AbstractParameter
     public function hydrate(array $argv): array
     {
         $multiple = $this->getOptions() & self::MULTIPLE;
-        $value    = $multiple ? [] : '';
+        $value    = $multiple ? [] : null;
         $args     = $argv;
         $length   = count($args);
         
@@ -74,10 +74,6 @@ class Param extends AbstractParameter
                 } elseif ($arg === '--' . $long) {
                     
                     if (!array_key_exists($i + 1, $argv)) {
-                        if ($long == 'offset') {
-                            var_dump($arg);
-                            var_dump($value);
-                        }
                         throw new ParameterException(sprintf('Missing value for parameter "--%s"', $long));
                     }
                     

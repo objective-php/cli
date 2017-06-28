@@ -81,9 +81,9 @@ class CliRequest implements RequestInterface
      *
      * @return ParameterContainerInterface|mixed
      */
-    public function getParam($param = null, $default = null, $origin = null)
+    public function getParam($param = null, $default = null, $origin = 'cli')
     {
-        // TODO: Implement getParam() method.
+        return $this->getParameters()->get($param, $default, $origin);
     }
     
     /**
