@@ -17,6 +17,7 @@ use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Cli\Action\Usage;
+use ObjectivePHP\Cli\Config\CliCommand;
 use ObjectivePHP\Cli\Request\CliRequest;
 use ObjectivePHP\Cli\Request\Parameter\Container\CliParameterContainer;
 use ObjectivePHP\Router\MatchedRoute;
@@ -48,6 +49,14 @@ class CliRouter implements RouterInterface
      */
     public function route(ApplicationInterface $app): RoutingResult
     {
+        
+        // just in time command registering
+        $commands = $app->getConfig()->get(CliCommand::class);
+        if($commands) {
+            foreach ($commands as $command) {
+                $this->registerCommand(new $command);
+            }
+        }
         if ($app->getRequest() instanceof CliRequest)
         {
             $requestedCommand = ltrim($app->getRequest()->getRoute());
