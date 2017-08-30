@@ -58,6 +58,7 @@ class Usage extends AbstractCliAction
             $maxCommandLength = 0;
             /** @var CliActionInterface $command */
             foreach ($this->getRouter()->getRegisteredCommands() as $command) {
+                if(!$command instanceof CliActionInterface) continue;
                 if (!is_object($command)) $command = new $command;
                 $commandLength = strlen($command->getCommand());
                 $maxCommandLength = max($commandLength, $maxCommandLength);
@@ -66,8 +67,12 @@ class Usage extends AbstractCliAction
         }
 
         /** @var CliActionInterface $command */
-        foreach ($this->getRouter()->getRegisteredCommands() as $command)
+        foreach ($this->getRouter()->getCommands() as $command)
         {
+            if (!$command instanceof CliActionInterface) {
+                continue;
+            }
+            
             if (!is_object($command)) $command = new $command;
 
             if ($this->getParam('command') && ($this->getParam('command') != $command->getCommand())) continue;
