@@ -19,12 +19,13 @@ use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
+use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
 
 /**
  * Class AbstractCliAction
  * @package ObjectivePHP\Cli\Action
  */
-abstract class AbstractCliAction implements CliActionInterface
+abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotationProvider
 {
 
     /**

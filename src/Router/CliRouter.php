@@ -23,6 +23,8 @@ use ObjectivePHP\Cli\Request\Parameter\Container\CliParameterContainer;
 use ObjectivePHP\Router\MatchedRoute;
 use ObjectivePHP\Router\RouterInterface;
 use ObjectivePHP\Router\RoutingResult;
+use ObjectivePHP\ServicesFactory\Exception\Exception;
+use ObjectivePHP\ServicesFactory\ServiceReference;
 
 /**
  * Class CliRouter
@@ -31,8 +33,10 @@ use ObjectivePHP\Router\RoutingResult;
 class CliRouter implements RouterInterface
 {
     protected $registeredCommands = [];
-
-
+    
+    protected $warningMessageDisplayed;
+    
+    
     /**
      * CliRouter constructor.
      */
@@ -49,14 +53,54 @@ class CliRouter implements RouterInterface
      */
     public function route(ApplicationInterface $app): RoutingResult
     {
+        $c = new CLImate();
         
         // just in time command registering
         $commands = $app->getConfig()->get(CliCommand::class);
         if($commands) {
             foreach ($commands as $command) {
-                $this->registerCommand(new $command);
+                
+                if($command instanceof ServiceReference)
+                {
+                    try {
+                        $commandInstance = $app->getServicesFactory()->get($command);
+                    } catch(Exception $e)
+                    {
+                        $this->warn('The command referencing service "' . $command->getId() . '" is not registered in the ServicesFactory');
+                        continue;
+                    }
+    
+                    if (!$commandInstance instanceof CliActionInterface) {
+                        $this->warn('The command referencing service "' . $command->getId() . '" is not an instance of ' . CliActionInterface::class);
+                        continue;
+                    }
+                    
+                } else {
+                    if(!class_exists($command))
+                    {
+                        $this->warn('The command class "' . $command->getId() . '" does not exist');
+                        continue;
+                    }
+                    
+                    $commandInstance = new $command;
+    
+    
+                    if (!$commandInstance instanceof CliActionInterface) {
+                        $this->warn('The command class "' . $command->getId() . '" is not an instance of ' . CliActionInterface::class);
+                        continue;
+                    }
+                    
+                    $app->getServicesFactory()->injectDependencies($commandInstance);
+                    
+                }
+    
+                
+                $this->registerCommand($commandInstance);
             }
         }
+        
+        if($this->warningMessageDisplayed) $c->br();
+        
         if ($app->getRequest() instanceof CliRequest)
         {
             $requestedCommand = ltrim($app->getRequest()->getRoute());
@@ -89,7 +133,7 @@ class CliRouter implements RouterInterface
                         array_shift($argv); // remove command
                         $handledParameters = [];
                         $arguments         = [];
-                        $c = new CLImate();
+                        
             
                         /** @var ParameterInterface $parameter */
                         foreach ($command->getExpectedParameters() as $parameter) {
@@ -186,6 +230,19 @@ class CliRouter implements RouterInterface
 
         return new RoutingResult();
 
+    }
+    
+    protected function warn($message)
+    {
+        $c = new CLImate();
+        if(!$this->warningMessageDisplayed)
+        {
+            $c->br();
+            $c->backgroundLightGray('<red>Warning:</red>');
+            $c->br();
+            $this->warningMessageDisplayed = true;
+        }
+        $c->tab()->out(' - ' .$message);
     }
 
     /**

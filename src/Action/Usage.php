@@ -44,10 +44,10 @@ class Usage extends AbstractCliAction
 
         $c = new CLImate();
 
-        $c->bold('Objective PHP Command Line Interface wrapper');
+        $c->underline('<bold>Objective PHP</bold> Command Line Interface')->br();
         if ($requestedCommand !== 'usage') {
             if ($requestedCommand) $c->out(sprintf("Unknown command <red>%s</red>. List of available commands:", $requestedCommand));
-            else $c->bold(sprintf("<red>No command</red> has been specified. List of available commands:", $requestedCommand));
+            else $c->out(sprintf("<red>No command</red> has been specified. List of available commands:", $requestedCommand));
         } elseif(!$this->getParam('command')) $c->bold('List of available commands');
 
         $c->br();
