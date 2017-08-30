@@ -73,7 +73,9 @@ class CliParameterContainer implements ParameterContainerInterface
      */
     public function get($param, $default = null, $origin = 'cli')
     {
-        return $this->params->get($origin)->get($param, $default);
+        
+        $value = $this->params->get($origin)->get($param, $default);
+        return is_null($value) ? $default : $value;
     }
     
     /**

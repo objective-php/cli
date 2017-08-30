@@ -43,6 +43,7 @@ class CliExceptionHandler
         }
         
         $c->bold('Message: ' . $exception->getMessage());
+        $c->lightGray('Type: ' . get_class($exception));
         $c->comment('thrown from ' . str_replace(getcwd() . '/', '',
                 $exception->getFile()) . ':' . $exception->getLine());
         $c->br();
