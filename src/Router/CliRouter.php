@@ -26,7 +26,6 @@ use ObjectivePHP\Router\RouterInterface;
 use ObjectivePHP\Router\RoutingResult;
 use ObjectivePHP\ServicesFactory\Exception\Exception;
 use ObjectivePHP\ServicesFactory\ServiceReference;
-use function var_dump;
 
 /**
  * Class CliRouter
