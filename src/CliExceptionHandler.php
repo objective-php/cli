@@ -17,7 +17,7 @@ class CliExceptionHandler
     function __invoke(ApplicationInterface $app)
     {
         $c = new CLImate();
-        
+
         $c->br();
         $c->border();
         $c->bold('Latest exception: ');
@@ -29,9 +29,9 @@ class CliExceptionHandler
             $previous = true;
         } while ($exception = $exception->getPrevious());
     }
-    
-    
-    protected function renderException(\Exception $exception, $isPrevious)
+
+
+    protected function renderException(\Throwable $exception, $isPrevious)
     {
         $c = new CLImate();
         $c->br();
@@ -41,7 +41,7 @@ class CliExceptionHandler
             $c->bold('Previous exception:');
             $c->border();
         }
-        
+
         $c->bold('Message: ' . $exception->getMessage());
         $c->lightGray('Type: ' . get_class($exception));
         $c->comment('thrown from ' . str_replace(getcwd() . '/', '',
@@ -49,7 +49,7 @@ class CliExceptionHandler
         $c->br();
         foreach ($exception->getTrace() as $i => $step) {
             $call = $step['class'] ? $step['class'] . $step['type'] . $step['function'] : $step['function'];
-            
+
             $args = [];
             foreach ($step['args'] as $arg) {
                 if (is_object($arg)) {
@@ -67,16 +67,16 @@ class CliExceptionHandler
                     $args[] = $arg;
                 }
             }
-            
-            
-            
+
+
+
             $call .= '(' . implode(', ', $args) . ')';
-            
+
             $c->tab()->inline('<bold>#' . $i . '</bold> ')->grey($call);
             $c->tab();
             $c->lightGreen('called from ' . str_replace(getcwd() . '/', '', $step['file']) . ':' . $step['line']);
             $c->br();
         }
-        
+
     }
 }
