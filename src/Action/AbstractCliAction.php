@@ -16,6 +16,7 @@ use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\ParameterException;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
+use ObjectivePHP\Cli\CliEvent;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
@@ -27,7 +28,6 @@ use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
  */
 abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotationProvider
 {
-
     /**
      * @var array
      */
@@ -82,9 +82,12 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
         $this->setServicesFactory($app->getServicesFactory());
         $this->setEventsHandler($app->getEventsHandler());
 
+        $this->getEventsHandler()->trigger(CliEvent::BEFORE_RUN_ACTION, $this);
         // actually execute action
-        return $this->run($app);
+        $response = $this->run($app);
+        $this->getEventsHandler()->trigger(CliEvent::AFTER_RUN_ACTION, $this);
 
+        return $response;
     }
 
     /**
