@@ -11,6 +11,10 @@ namespace ObjectivePHP\Cli\Action;
 
 use ObjectivePHP\Cli\CliException;
 
+/**
+ * Class CliActionException
+ * @package ObjectivePHP\Cli\Action
+ */
 class CliActionException extends CliException
 {
     

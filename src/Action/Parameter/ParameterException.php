@@ -12,6 +12,10 @@ namespace ObjectivePHP\Cli\Action\Parameter;
 
 use ObjectivePHP\Cli\Action\CliActionException;
 
+/**
+ * Class ParameterException
+ * @package ObjectivePHP\Cli\Action\Parameter
+ */
 class ParameterException extends CliActionException
 {
     

@@ -15,6 +15,10 @@ use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\Toggle;
 use ObjectivePHP\Cli\Router\CliRouter;
 
+/**
+ * Class Usage
+ * @package ObjectivePHP\Cli\Action
+ */
 class Usage extends AbstractCliAction
 {
     protected $command = 'usage';

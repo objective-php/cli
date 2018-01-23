@@ -16,6 +16,10 @@ use ObjectivePHP\Message\Request\RequestInterface;
 use ObjectivePHP\Router\MatchedRoute;
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Class CliRequest
+ * @package ObjectivePHP\Cli\Request
+ */
 class CliRequest implements RequestInterface
 {
     /**

@@ -10,20 +10,43 @@
 namespace ObjectivePHP\Cli\Action\Parameter;
 
 
-use ObjectivePHP\Primitives\String\Str;
-
+/**
+ * Class AbstractParameter
+ * @package ObjectivePHP\Cli\Action\Parameter
+ */
 abstract class AbstractParameter implements ParameterInterface
 {
+    /**
+     * @var int $options
+     */
     protected $options = 0;
-    
+
+    /**
+     * @var string $shortName
+     */
     protected $shortName = '';
-    
+
+    /**
+     * @var string $longName
+     */
     protected $longName = '';
-    
+
+    /**
+     * @var $value
+     */
     protected $value;
-    
+
+    /**
+     * @var $description
+     */
     protected $description;
-    
+
+    /**
+     * AbstractParameter constructor.
+     * @param $name
+     * @param string $description
+     * @param int $options
+     */
     public function __construct($name, $description = '', $options = 0)
     {
         $this->setName($name);

@@ -31,8 +31,11 @@ class Argument extends AbstractParameter
         $this->setDescription($description);
         $this->setOptions($options);
     }
-    
-    
+
+    /**
+     * @param array $argv
+     * @return array
+     */
     public function hydrate(array $argv): array
     {
         $value = null;

@@ -9,11 +9,16 @@
 
 namespace ObjectivePHP\Cli\Action\Parameter;
 
-
+/**
+ * Class Toggle
+ * @package ObjectivePHP\Cli\Action\Parameter
+ */
 class Toggle extends AbstractParameter
 {
-    
-    
+    /**
+     * @param array $argv
+     * @return array
+     */
     public function hydrate(array $argv): array
     {
         $value = 0;

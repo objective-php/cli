@@ -245,7 +245,10 @@ class CliRouter implements RouterInterface
         return new RoutingResult();
         
     }
-    
+
+    /**
+     * @param $message
+     */
     protected function warn($message)
     {
         $c = new CLImate();
@@ -257,7 +260,10 @@ class CliRouter implements RouterInterface
         }
         $c->tab()->out(' - ' . $message);
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getCommands()
     {
         return $this->commands;

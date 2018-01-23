@@ -10,6 +10,10 @@
 
 namespace ObjectivePHP\Cli;
 
+/**
+ * Class CliException
+ * @package ObjectivePHP\Cli
+ */
 class CliException extends \Exception
 {
     

@@ -9,11 +9,17 @@
 
 namespace ObjectivePHP\Cli\Action\Parameter;
 
-
+/**
+ * Class Param
+ * @package ObjectivePHP\Cli\Action\Parameter
+ */
 class Param extends AbstractParameter
 {
-    
-    
+    /**
+     * @param array $argv
+     * @return array
+     * @throws ParameterException
+     */
     public function hydrate(array $argv): array
     {
         $multiple = $this->getOptions() & self::MULTIPLE;

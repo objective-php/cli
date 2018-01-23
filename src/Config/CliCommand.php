@@ -11,6 +11,10 @@ namespace ObjectivePHP\Cli\Config;
 
 use ObjectivePHP\Config\StackedValuesDirective;
 
+/**
+ * Class CliCommand
+ * @package ObjectivePHP\Cli\Config
+ */
 class CliCommand extends StackedValuesDirective
 {
     

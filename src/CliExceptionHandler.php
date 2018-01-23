@@ -12,8 +12,15 @@ namespace ObjectivePHP\Cli;
 use League\CLImate\CLImate;
 use ObjectivePHP\Application\ApplicationInterface;
 
+/**
+ * Class CliExceptionHandler
+ * @package ObjectivePHP\Cli
+ */
 class CliExceptionHandler
 {
+    /**
+     * @param ApplicationInterface $app
+     */
     function __invoke(ApplicationInterface $app)
     {
         $c = new CLImate();
@@ -30,7 +37,10 @@ class CliExceptionHandler
         } while ($exception = $exception->getPrevious());
     }
 
-
+    /**
+     * @param \Throwable $exception
+     * @param $isPrevious
+     */
     protected function renderException(\Throwable $exception, $isPrevious)
     {
         $c = new CLImate();
