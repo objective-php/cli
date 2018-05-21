@@ -10,28 +10,26 @@
 namespace ObjectivePHP\Cli\Action\Parameter;
 
 
-use ObjectivePHP\Primitives\String\Str;
-
 abstract class AbstractParameter implements ParameterInterface
 {
     protected $options = 0;
-    
+
     protected $shortName = '';
-    
+
     protected $longName = '';
-    
+
     protected $value;
-    
+
     protected $description;
-    
+
     public function __construct($name, $description = '', $options = 0)
     {
         $this->setName($name);
         $this->setDescription($description);
         $this->setOptions($options);
     }
-    
-    
+
+
     /**
      * @return int
      */
@@ -39,7 +37,7 @@ abstract class AbstractParameter implements ParameterInterface
     {
         return $this->options;
     }
-    
+
     /**
      * @param int $options
      *
@@ -48,18 +46,18 @@ abstract class AbstractParameter implements ParameterInterface
     public function setOptions(int $options)
     {
         $this->options = $options;
-        
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
-    public function getShortName() : string
+    public function getShortName(): string
     {
         return $this->shortName;
     }
-    
+
     /**
      * @param string|array $name
      *
@@ -67,40 +65,35 @@ abstract class AbstractParameter implements ParameterInterface
      */
     public function setName($name)
     {
-        if(is_array($name))
-        {
+        if (is_array($name)) {
             reset($name);
             $shortName = key($name);
-            $longName  = current($name);
-    
-            if (strlen($shortName) !== 1)
-            {
+            $longName = current($name);
+
+            if (strlen($shortName) !== 1) {
                 throw new ParameterException('Short parameters name has to be exactly one character long');
             }
-            
+
             $this->shortName = $shortName;
             $this->longName = $longName;
-        }
-        else if (strlen($name) == 1)
-        {
+        } else if (strlen($name) == 1) {
             $this->shortName = $name;
-        }
-        else {
+        } else {
             $this->longName = $name;
         }
-        
+
         return $this;
     }
-    
+
     /**
      * @return mixed
      */
-    public function getLongName() : string
+    public function getLongName(): string
     {
         return $this->longName;
     }
-    
-    
+
+
     /**
      * @return mixed
      */
@@ -108,7 +101,7 @@ abstract class AbstractParameter implements ParameterInterface
     {
         return $this->value;
     }
-    
+
     /**
      * @param mixed $value
      *
@@ -117,18 +110,18 @@ abstract class AbstractParameter implements ParameterInterface
     public function setValue($value)
     {
         $this->value = $value;
-        
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
-    
+
     /**
      * @param mixed $description
      *
@@ -137,7 +130,7 @@ abstract class AbstractParameter implements ParameterInterface
     public function setDescription($description)
     {
         $this->description = $description;
-        
+
         return $this;
     }
 }

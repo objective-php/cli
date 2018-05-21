@@ -1,6 +1,6 @@
 <?php
 
-namespace ObjectivePHP\Cli;
+namespace ObjectivePHP\Cli\Event;
 
 /**
  * Interface CliEvent

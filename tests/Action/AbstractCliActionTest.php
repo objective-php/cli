@@ -4,7 +4,7 @@ namespace Tests\ObjectivePHP\Application\Action;
 
 use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Cli\Action\AbstractCliAction;
-use ObjectivePHP\Cli\CliEvent;
+use ObjectivePHP\Cli\Event\CliEvent;
 use ObjectivePHP\Events\EventsHandler;
 
 /**
@@ -39,6 +39,6 @@ class AbstractCliActionTest extends \PHPUnit_Framework_TestCase
             ->method('getEventsHandler')
             ->willReturn($spy);
 
-        $action->__invoke($application);
+        $action->run($application);
     }
 }

@@ -36,19 +36,16 @@ class Usage extends AbstractCliAction
 
 
     /**
-     * @param ApplicationInterface $app
+     * @param AbstractCliAction $app
      */
-    public function run(ApplicationInterface $app)
+    public function run(ApplicationInterface $app, CLImate $c = null, $requestedCommand = null)
     {
-        $requestedCommand = ltrim($app->getRequest()->getRoute());
-
-        $c = new CLImate();
 
         $c->br()->underline('<bold>Objective PHP</bold> Command Line Interface')->br();
         if ($requestedCommand !== 'usage') {
             if ($requestedCommand) $c->out(sprintf("Unknown command <red>%s</red>. List of available commands:", $requestedCommand));
             else $c->out(sprintf("<red>No command</red> has been specified. List of available commands:", $requestedCommand));
-        } elseif(!$this->getParam('command')) $c->bold('List of available commands');
+        } elseif (!$this->getParam('command')) $c->bold('List of available commands');
 
         $c->br();
 
@@ -57,8 +54,9 @@ class Usage extends AbstractCliAction
             // compute padding width
             $maxCommandLength = 0;
             /** @var CliActionInterface $command */
-            foreach ($this->getRouter()->getRegisteredCommands() as $command) {
-                if(!$command instanceof CliActionInterface) continue;
+            foreach ($app->findAvailableCommands() as $command) {
+
+                if (!$command instanceof CliActionInterface) continue;
                 if (!is_object($command)) $command = new $command;
                 $commandLength = strlen($command->getCommand());
                 $maxCommandLength = max($commandLength, $maxCommandLength);
@@ -67,13 +65,10 @@ class Usage extends AbstractCliAction
         }
 
         /** @var CliActionInterface $command */
-        foreach ($this->getRouter()->getCommands() as $command)
-        {
+        foreach ($app->findAvailableCommands() as $command) {
             if (!$command instanceof CliActionInterface) {
                 continue;
             }
-            
-            if (!is_object($command)) $command = new $command;
 
             if ($this->getParam('command') && ($this->getParam('command') != $command->getCommand())) continue;
 

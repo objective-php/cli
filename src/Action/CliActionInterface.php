@@ -10,13 +10,11 @@
 namespace ObjectivePHP\Cli\Action;
 
 
-use ObjectivePHP\Invokable\InvokableInterface;
-
 /**
  * Interface CliActionInterface
  * @package ObjectivePHP\Cli\Action
  */
-interface CliActionInterface extends InvokableInterface
+interface CliActionInterface
 {
     /**
      * @return array

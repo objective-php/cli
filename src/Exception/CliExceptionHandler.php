@@ -6,15 +6,14 @@
  * Time: 13:49
  */
 
-namespace ObjectivePHP\Cli;
+namespace ObjectivePHP\Cli\Exception;
 
 
 use League\CLImate\CLImate;
-use ObjectivePHP\Application\ApplicationInterface;
 
 class CliExceptionHandler
 {
-    function __invoke(ApplicationInterface $app)
+    function handle(\Throwable $exception)
     {
         $c = new CLImate();
 
@@ -22,7 +21,6 @@ class CliExceptionHandler
         $c->border();
         $c->bold('Latest exception: ');
         $c->border();
-        $exception = $app->getException();
         $previous = false;
         do {
             $this->renderException($exception, $previous);
@@ -35,8 +33,7 @@ class CliExceptionHandler
     {
         $c = new CLImate();
         $c->br();
-        if($isPrevious)
-        {
+        if ($isPrevious) {
             $c->border();
             $c->bold('Previous exception:');
             $c->border();
@@ -54,12 +51,11 @@ class CliExceptionHandler
             foreach ($step['args'] as $arg) {
                 if (is_object($arg)) {
                     $args[] = '<cyan>' . get_class($arg) . '</cyan>';
-                }
-                elseif (is_numeric($arg)) {
+                } elseif (is_numeric($arg)) {
                     $args[] = '<blue>' . $arg . '</blue>';
                 } elseif (is_string($arg)) {
                     $args[] = '<red>"' . $arg . '"</red>';
-                }elseif (is_array($arg)) {
+                } elseif (is_array($arg)) {
                     $args[] = '<light_magenta>array(' . count($arg) . ')</light_magenta>';
                 } elseif (is_resource($arg)) {
                     $args[] = '<yellow>ressource (' . get_resource_type($arg) . ')</yellow>';
@@ -67,7 +63,6 @@ class CliExceptionHandler
                     $args[] = $arg;
                 }
             }
-
 
 
             $call .= '(' . implode(', ', $args) . ')';

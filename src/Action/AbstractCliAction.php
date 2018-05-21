@@ -17,10 +17,11 @@ use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\ParameterException;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
 use ObjectivePHP\Cli\CliEvent;
+use ObjectivePHP\Cli\Exception\CliException;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\Invokable\InvokableInterface;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
-use ObjectivePHP\ServicesFactory\Specs\InjectionAnnotationProvider;
+use ObjectivePHP\ServicesFactory\Specification\InjectionAnnotationProvider;
 
 /**
  * Class AbstractCliAction
@@ -36,22 +37,12 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
     /**
      * @var
      */
-    protected $eventsHandler;
-
-    /**
-     * @var
-     */
     protected $application;
-
-    /**
-     * @var
-     */
-    protected $servicesFactory;
 
     /**
      * @var string
      */
-    protected $command = '';
+    protected $command;
 
     /**
      * @var string
@@ -63,32 +54,6 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
      */
     protected $allowUnexpectedParameters = false;
 
-    /**
-     * @param array $args
-     *
-     * @return mixed
-     * @throws CliActionException
-     */
-    public function __invoke(...$args)
-    {
-
-        $app = array_shift($args);
-
-        if (!$app instanceof ApplicationInterface) {
-            throw new CliActionException('Action must be invoked with an ApplicationInterface instance as first parameter');
-        }
-
-        $this->setApplication($app);
-        $this->setServicesFactory($app->getServicesFactory());
-        $this->setEventsHandler($app->getEventsHandler());
-
-        $this->getEventsHandler()->trigger(CliEvent::BEFORE_RUN_ACTION, $this);
-        // actually execute action
-        $response = $this->run($app);
-        $this->getEventsHandler()->trigger(CliEvent::AFTER_RUN_ACTION, $this);
-
-        return $response;
-    }
 
     /**
      * @param ParameterInterface $parameter
@@ -214,9 +179,13 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
      * @param string $origin
      * @return mixed
      */
-    public function getParam($param, $default = null, $origin = 'cli')
+    public function getParam($param, $default = null)
     {
-        return $this->getApplication()->getRequest()->getParameters()->get($param, $default, $origin);
+        if(isset($this->expectedParameters[$param])) {
+            return $this->expectedParameters[$param]->getValue() ?? $default;
+        }
+
+        throw new CliActionException(sprintf('Requested parameter "%s" is not expected by this command', $param));
     }
 
     /**
@@ -235,59 +204,6 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
     public function setApplication(ApplicationInterface $application): InvokableInterface
     {
         $this->application = $application;
-
-        return $this;
-    }
-
-    /**
-     * Return the given service
-     *
-     * @param $serviceId
-     *
-     * @return mixed|null
-     * @throws \ObjectivePHP\ServicesFactory\Exception
-     */
-    public function getService($serviceId)
-    {
-        return $this->getServicesFactory()->get($serviceId);
-    }
-
-    /**
-     * @return ServicesFactory
-     */
-    public function getServicesFactory(): ServicesFactory
-    {
-        return $this->servicesFactory;
-    }
-
-    /**
-     * @param ServicesFactory $servicesFactory
-     *
-     * @return $this
-     */
-    public function setServicesFactory(ServicesFactory $servicesFactory)
-    {
-        $this->servicesFactory = $servicesFactory;
-
-        return $this;
-    }
-
-    /**
-     * @return EventsHandler
-     */
-    public function getEventsHandler()
-    {
-        return $this->eventsHandler;
-    }
-
-    /**
-     * @param EventsHandler $eventsHandler
-     *
-     * @return $this
-     */
-    public function setEventsHandler($eventsHandler)
-    {
-        $this->eventsHandler = $eventsHandler;
 
         return $this;
     }
@@ -318,6 +234,9 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
      */
     public function getCommand(): string
     {
+        if(is_null($this->command)) {
+            throw new CliException(sprintf('%s cli command attributes "$command" has no value set.', get_class($this)));
+        }
         return $this->command;
     }
 
@@ -331,15 +250,6 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
 
         return $this;
     }
-
-    /**
-     * @return $this
-     */
-    public function getCallable()
-    {
-        return $this;
-    }
-
 
     /**
      * @param ApplicationInterface $app
