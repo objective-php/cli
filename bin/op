@@ -3,25 +3,23 @@
 $cwd = getcwd();
 
 // define bootstrap path
-if(file_exists('.op.cli'))
-{
+if (file_exists('.op.cli')) {
     $bootstrap = trim(file_get_contents('.op.cli'));
     goto bootstrap;
 }
 
-while($path = realpath('..'))
-{
+while ($path = realpath('..')) {
     chdir('..');
-    foreach(new DirectoryIterator($path) as $entry)
-    {
-        if($entry->isFile() && $entry->getBasename() == '.op.cli')
-        {
+    foreach (new DirectoryIterator($path) as $entry) {
+        if ($entry->isFile() && $entry->getBasename() == '.op.cli') {
             $bootstrap = file_get_contents($entry->getFilename());
             goto bootstrap;
         }
     }
 
-    if($path == '/') goto fallback;
+    if ($path == '/') {
+        goto fallback;
+    }
 }
 
 fallback:
@@ -33,23 +31,24 @@ chdir($cwd);
 $bootstrap = 'public/index.php';
 
 bootstrap:
-if(is_dir(dirname($bootstrap))) {
+if (is_dir(dirname($bootstrap))) {
     chdir(dirname($bootstrap));
-}
-else {
+} else {
     echo 'An error occurred while trying to load the bootstrap file "' . $bootstrap . '"' . PHP_EOL;
     echo 'Bootstrap directory "' . dirname($bootstrap) . '" does not exist' . PHP_EOL;
+
     return 1;
 }
-if(is_file(basename($bootstrap))) {
+
+if (is_file(basename($bootstrap))) {
     include basename($bootstrap);
-} else
-{
+} else {
     echo 'An error occurred while trying to load the bootstrap file "' . $bootstrap . '"' . PHP_EOL;
     echo 'Bootstrap file "' . basename($bootstrap) . '" does not exist' . PHP_EOL;
+
     return 1;
 }
 
 chdir($cwd);
-return 0;
 
+return 0;

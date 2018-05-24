@@ -11,10 +11,11 @@ namespace Tests\ObjectivePHP\Application\Action\Paramter\Cli;
 
 
 use ObjectivePHP\Cli\Action\Parameter\Argument;
+use PHPUnit\Framework\TestCase;
 
-class ArgumentTest extends \PHPUnit_Framework_TestCase
+class ArgumentTest extends TestCase
 {
-    
+
     /**
      * @dataProvider getDataForTestHydration
      */
@@ -24,15 +25,15 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
         {
             $this->expectException($expectedValue);
         }
-        
+
         $param = new Argument($name, '', $options);
-        
+
         $cliAfterHydration = $param->hydrate($argv);
-        
+
         $this->assertEquals($expectedValue, $param->getValue());
         $this->assertEquals($remainingArgv, $cliAfterHydration);
     }
-    
+
     public function getDataForTestHydration()
     {
         return
@@ -41,5 +42,5 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
                 [['filename.php', 'other.php'], 'file', Argument::MULTIPLE, ['filename.php', 'other.php'], []],
             ];
     }
-    
+
 }

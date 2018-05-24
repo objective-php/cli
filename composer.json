@@ -2,23 +2,30 @@
     "name": "objective-php/cli",
     "description": "Cli commands handling library",
     "type": "library",
+    "license": "GPL-3.0",
     "keywords": [
         "cli",
         "objective php"
     ],
-    "require": {
-        "league/climate": "^3.2"
-    },
-    "require-dev": {
-        "objective-php/application": "~2.0.0"
-    },
-    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Gauthier 'Rusty' Delamarre",
             "email": "gauthier@objective-php.org"
         }
     ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../application"
+        }
+    ],
+    "require": {
+        "league/climate": "^3.2",
+        "objective-php/application": "^2.0.2"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.4"
+    },
     "autoload": {
         "psr-4": {
             "ObjectivePHP\\Cli\\": "src/"

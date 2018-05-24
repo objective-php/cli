@@ -9,22 +9,18 @@
 
 namespace ObjectivePHP\Cli\Action;
 
-
 use League\CLImate\CLImate;
 use League\CLImate\Util\Cursor;
 use ObjectivePHP\Application\ApplicationInterface;
 use ObjectivePHP\Cli\Action\Parameter\Argument;
 use ObjectivePHP\Cli\Action\Parameter\ParameterException;
 use ObjectivePHP\Cli\Action\Parameter\ParameterInterface;
-use ObjectivePHP\Cli\CliEvent;
 use ObjectivePHP\Cli\Exception\CliException;
-use ObjectivePHP\Events\EventsHandler;
-use ObjectivePHP\Invokable\InvokableInterface;
-use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specification\InjectionAnnotationProvider;
 
 /**
  * Class AbstractCliAction
+ *
  * @package ObjectivePHP\Cli\Action
  */
 abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotationProvider
@@ -54,9 +50,9 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
      */
     protected $allowUnexpectedParameters = false;
 
-
     /**
      * @param ParameterInterface $parameter
+     *
      * @return $this
      * @throws ParameterException
      */
@@ -72,7 +68,13 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
             }
 
             if ($lastArgument && !($lastArgument->getOptions() & ParameterInterface::MANDATORY)) {
-                throw new ParameterException(sprintf('It is forbidden to expect a mandatory parameter (%s) after an optional one (%s)', $parameter->getLongName(), $expectedParameter->getLongName()));
+                throw new ParameterException(
+                    sprintf(
+                        'It is forbidden to expect a mandatory parameter (%s) after an optional one (%s)',
+                        $parameter->getLongName(),
+                        $expectedParameter->getLongName()
+                    )
+                );
             }
         }
 
@@ -91,7 +93,6 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
 
             $this->expectedParameters[$longName] = $parameter;
         }
-
 
         return $this;
     }
@@ -141,32 +142,46 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
         foreach ($expectedParameters as $parameter) {
             $output = $style = '';
 
-            if (in_array($parameter, $handledParameters)) continue;
+            if (in_array($parameter, $handledParameters)) {
+                continue;
+            }
+
             $shortName = $parameter->getShortName();
             $longName = $parameter->getLongName();
 
-            if ($parameter->getOptions() & ParameterInterface::MANDATORY) $style = 'mandatory';
-            else $style = 'dim';
+            if ($parameter->getOptions() & ParameterInterface::MANDATORY) {
+                $style = 'mandatory';
+            } else {
+                $style = 'dim';
+            }
 
             if (!$parameter instanceof Argument) {
                 $argName = '';
-                if ($longName) $argName .= '--' . $longName;
-                if ($shortName && $longName) $argName .= " | ";
-                if ($shortName) $argName .= '-' . $shortName;
+
+                if ($longName) {
+                    $argName .= '--' . $longName;
+                }
+
+                if ($shortName && $longName) {
+                    $argName .= " | ";
+                }
+
+                if ($shortName) {
+                    $argName .= '-' . $shortName;
+                }
+
                 $argName = sprintf('<%s>' . $argName . '</%s>', $style, $style);
             } else {
                 $argName = $longName;
                 $argName = sprintf('<<%s>' . $argName . '</%s>>', $style, $style);
             }
 
-
-            $parametersList[] = [$argName,  $parameter->getDescription()];
+            $parametersList[] = [$argName, $parameter->getDescription()];
 
             $handledParameters[] = $parameter;
         }
 
-        foreach($parametersList as $param)
-        {
+        foreach ($parametersList as $param) {
             $c->tab()->inline($param[0])->inline("\r" . "\033[30C")->out($param[1]);
         }
 
@@ -174,14 +189,15 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
     }
 
     /**
-     * @param $param
-     * @param null $default
+     * @param        $param
+     * @param null   $default
      * @param string $origin
+     *
      * @return mixed
      */
     public function getParam($param, $default = null)
     {
-        if(isset($this->expectedParameters[$param])) {
+        if (isset($this->expectedParameters[$param])) {
             return $this->expectedParameters[$param]->getValue() ?? $default;
         }
 
@@ -199,9 +215,9 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
     /**
      * @param ApplicationInterface $application
      *
-     * @return $this|InvokableInterface
+     * @return $this
      */
-    public function setApplication(ApplicationInterface $application): InvokableInterface
+    public function setApplication(ApplicationInterface $application)
     {
         $this->application = $application;
 
@@ -220,6 +236,7 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
 
     /**
      * @param string $description
+     *
      * @return $this
      */
     public function setDescription(string $description)
@@ -234,14 +251,16 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
      */
     public function getCommand(): string
     {
-        if(is_null($this->command)) {
+        if (is_null($this->command)) {
             throw new CliException(sprintf('%s cli command attributes "$command" has no value set.', get_class($this)));
         }
+
         return $this->command;
     }
 
     /**
      * @param $command
+     *
      * @return $this
      */
     public function setCommand($command)
@@ -253,6 +272,7 @@ abstract class AbstractCliAction implements CliActionInterface, InjectionAnnotat
 
     /**
      * @param ApplicationInterface $app
+     *
      * @return mixed
      */
     abstract public function run(ApplicationInterface $app);

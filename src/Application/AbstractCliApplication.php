@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: gde
- * Date: 15/05/2018
- * Time: 14:00
- */
 
 namespace ObjectivePHP\Cli\Application;
-
 
 use Composer\Autoload\ClassLoader;
 use League\CLImate\CLImate;
@@ -25,20 +18,27 @@ use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specification\PrefabServiceSpecification;
 
+/**
+ * Class AbstractCliApplication
+ *
+ * @package ObjectivePHP\Cli\Application
+ */
 class AbstractCliApplication extends AbstractApplication implements CliApplicationInterface
 {
-
-
-    protected $router;
-
-    /** @var CLImate */
+    /**
+     * @var CLImate
+     */
     protected $console;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $commands;
 
     /**
+     * AbstractCliApplication constructor.
      *
+     * @param ClassLoader|null $autoloader
      */
     public function __construct(ClassLoader $autoloader = null)
     {
@@ -68,11 +68,8 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
         // load default configuration parameters
         $this->getConfig()->hydrate($this->getConfigParams());
 
-
         $this->servicesFactory = (new ServicesFactory())
             ->registerService(new PrefabServiceSpecification('application', $this));
-
-
     }
 
     /**
@@ -91,10 +88,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
         $this->console = $console;
     }
 
-
-    /**
-     * @return mixed
-     */
     public function init()
     {
         // override this method in your own CliApplication class
@@ -109,8 +102,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
         $c = $this->getConsole();
 
         try {
-
-
             // init parameters
             $cliParameters = [];
             $argv = $_SERVER['argv'];
@@ -120,7 +111,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
             $handledParameters = [];
             $arguments = [];
 
-
             if (empty($requestedCommand)) {
                 goto usage;
             }
@@ -128,8 +118,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
             $commands = $this->findAvailableCommands();
 
             foreach ($commands as $command) {
-
-
                 if (!($command->getCommand() === $requestedCommand)) {
                     continue;
                 }
@@ -138,7 +126,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
 
                 /** @var ParameterInterface $parameter */
                 foreach ($command->getExpectedParameters() as $parameter) {
-
                     // skip aliased parameters that are already handled
                     if (in_array($parameter, $handledParameters)) {
                         continue;
@@ -163,23 +150,29 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
 
                         if ($longName && $shortName) {
                             $cliParameters[$longName] = &$cliParameters[$shortName];
-                        } else if ($longName) {
-                            $cliParameters[$longName] = $value;
+                        } else {
+                            if ($longName) {
+                                $cliParameters[$longName] = $value;
+                            }
                         }
-                    } else if ($parameter->getOptions() & ParameterInterface::MANDATORY) {
-                        $c->br();
-                        $c->error(sprintf('Mandatory parameter "%s" is missing',
-                            $parameter->getLongName() ?: $parameter->getShortName()));
-                        $c->br();
-                        echo $command->getUsage();
-                        $c->br();
-                        exit;
-
+                    } else {
+                        if ($parameter->getOptions() & ParameterInterface::MANDATORY) {
+                            $c->br();
+                            $c->error(
+                                sprintf(
+                                    'Mandatory parameter "%s" is missing',
+                                    $parameter->getLongName() ?: $parameter->getShortName()
+                                )
+                            );
+                            $c->br();
+                            echo $command->getUsage();
+                            $c->br();
+                            exit;
+                        }
                     }
 
                     $handledParameters[] = $parameter;
                 }
-
 
                 // look for unexpected params or toggles
                 if (!$command->areUnexpectedParametersAllowed()) {
@@ -196,13 +189,16 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
 
                 /** @var Argument $argument */
                 foreach ($arguments as $argument) {
-
                     $argv = $argument->hydrate($argv);
                     $value = $argument->getValue();
                     if (is_null($value) && ($argument->getOptions() & Argument::MANDATORY)) {
                         $c->br();
-                        $c->out(sprintf('Mandatory argument "<error>%s</error>" is missing',
-                            $argument->getLongName()));
+                        $c->out(
+                            sprintf(
+                                'Mandatory argument "<error>%s</error>" is missing',
+                                $argument->getLongName()
+                            )
+                        );
                         $c->br();
                         echo $command->getUsage();
                         $c->br();
@@ -248,7 +244,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
 
     public function findAvailableCommands()
     {
-
         if (is_null($this->commands)) {
             $this->commands = [new Usage()];
             // load commands
@@ -279,14 +274,19 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
                 $command = new $commandClass;
 
                 if (!$command instanceof CliActionInterface) {
-                    throw new CliException(sprintf('Cannot register command "%s" because it does not implement %s', get_class($command), CliActionInterface::class));
+                    throw new CliException(
+                        sprintf(
+                            'Cannot register command "%s" because it does not implement %s',
+                            get_class($command),
+                            CliActionInterface::class
+                        )
+                    );
                 }
 
                 $this->commands[] = $command;
             }
         }
+
         return $this->commands;
     }
-
-
 }
