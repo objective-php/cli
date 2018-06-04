@@ -14,6 +14,7 @@ use ObjectivePHP\Cli\Action\Usage;
 use ObjectivePHP\Cli\Config\CliCommandsPaths;
 use ObjectivePHP\Cli\Exception\CliException;
 use ObjectivePHP\Cli\Exception\CliExceptionHandler;
+use ObjectivePHP\Config\Loader\FileLoader\FileLoader;
 use ObjectivePHP\Events\EventsHandler;
 use ObjectivePHP\ServicesFactory\ServicesFactory;
 use ObjectivePHP\ServicesFactory\Specification\PrefabServiceSpecification;
@@ -42,34 +43,9 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
      */
     public function __construct(ClassLoader $autoloader = null)
     {
-        $buffer = $this->cleanBuffer();
-        ob_start();
-
-        if ($buffer) {
-            echo $buffer;
-        }
-
-        if ($autoloader) {
-            // register packages autoloading
-            $this->setAutoloader($autoloader);
-            // register default local packages storage
-            $reflectionObject = new \ReflectionObject($this);
-            $this->getAutoloader()->addPsr4($reflectionObject->getNamespaceName() . '\\Package\\', 'packages/');
-        }
-
         $this->console = new CLImate();
-        $this->eventsHandler = new EventsHandler();
 
-        $this->triggerWorkflowEvent(WorkflowEvent::BOOTSTRAP_INIT);
-
-        // register default configuration directives
-        $this->getConfig()->registerDirective(...$this->getConfigDirectives());
-
-        // load default configuration parameters
-        $this->getConfig()->hydrate($this->getConfigParams());
-
-        $this->servicesFactory = (new ServicesFactory())
-            ->registerService(new PrefabServiceSpecification('application', $this));
+        parent::__construct($autoloader);
     }
 
     /**
@@ -86,12 +62,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
     public function setConsole(CLImate $console)
     {
         $this->console = $console;
-    }
-
-    public function init()
-    {
-        // override this method in your own CliApplication class
-        // to make init act as a delegated constructor
     }
 
     /**
@@ -116,6 +86,11 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
             }
 
             $commands = $this->findAvailableCommands();
+
+            // read configuration
+            if (is_dir('app/config')) {
+                $this->getConfig()->hydrate((new FileLoader())->load('app/config'));
+            }
 
             foreach ($commands as $command) {
                 if (!($command->getCommand() === $requestedCommand)) {
