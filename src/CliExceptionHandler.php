@@ -48,7 +48,11 @@ class CliExceptionHandler
                 $exception->getFile()) . ':' . $exception->getLine());
         $c->br();
         foreach ($exception->getTrace() as $i => $step) {
-            $call = $step['class'] ? $step['class'] . $step['type'] . $step['function'] : $step['function'];
+            if (array_key_exists('class', $step)) {
+                $call = $step['class'] ? $step['class'] . $step['type'] . $step['function'] : $step['function'];
+            } else {
+                $call = $step['file'] . $step['function'];
+            }
 
             $args = [];
             foreach ($step['args'] as $arg) {
