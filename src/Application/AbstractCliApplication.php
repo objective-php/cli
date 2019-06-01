@@ -65,7 +65,7 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
         $this->getConfig()->registerDirective(...$this->getConfigDirectives());
 
         // load default configuration parameters
-        $this->getConfig()->hydrate($this->getConfigParams());
+        $this->getConfig()->hydrate($this->getParameters());
 
     }
 
@@ -231,10 +231,10 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
     /**
      * @return array
      */
-    protected function getConfigParams()
+    protected function getParameters()
     {
         return [
-            'cli.commands.paths' => ['default' => getcwd() . '/app/src/Cli']
+            CliCommandsPaths::KEY => ['default' => getcwd() . '/app/src/Cli'],
         ];
     }
 
