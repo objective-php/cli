@@ -262,7 +262,7 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
                 // exclude abstract classes or interfaces
                 $reflectedCommand = new \ReflectionClass($commandClass);
 
-                if ($reflectedCommand->isAbstract() || $reflectedCommand->isInterface()) {
+                if ($reflectedCommand->isAbstract() || $reflectedCommand->isInterface() || $reflectedCommand->isTrait()) {
                     continue;
                 }
 
