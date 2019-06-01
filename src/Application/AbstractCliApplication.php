@@ -5,6 +5,7 @@ namespace ObjectivePHP\Cli\Application;
 use Composer\Autoload\ClassLoader;
 use League\CLImate\CLImate;
 use ObjectivePHP\Application\AbstractApplication;
+use ObjectivePHP\Application\AbstractEngine;
 use ObjectivePHP\Application\Workflow\WorkflowEvent;
 use ObjectivePHP\Cli\Action\AbstractCliAction;
 use ObjectivePHP\Cli\Action\CliActionInterface;
@@ -40,27 +41,25 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
      *
      * @param ClassLoader|null $autoloader
      */
-    public function __construct(ClassLoader $autoloader = null)
+    public function __construct(AbstractEngine $engine)
     {
+        $this->setEngine($engine);
         $buffer = $this->cleanBuffer();
+
         ob_start();
 
         if ($buffer) {
             echo $buffer;
         }
 
-        if ($autoloader) {
-            // register packages autoloading
-            $this->setAutoloader($autoloader);
+        if ($autoloader = $this->getEngine()->getAutoloader()) {
             // register default local packages storage
             $reflectionObject = new \ReflectionObject($this);
-            $this->getAutoloader()->addPsr4($reflectionObject->getNamespaceName() . '\\Package\\', 'packages/');
+            $autoloader->addPsr4($reflectionObject->getNamespaceName() . '\\Package\\', 'app/packages/');
         }
 
         $this->console = new CLImate();
         $this->eventsHandler = new EventsHandler();
-
-        $this->triggerWorkflowEvent(WorkflowEvent::BOOTSTRAP_INIT);
 
         // register default configuration directives
         $this->getConfig()->registerDirective(...$this->getConfigDirectives());
@@ -68,8 +67,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
         // load default configuration parameters
         $this->getConfig()->hydrate($this->getConfigParams());
 
-        $this->servicesFactory = (new ServicesFactory())
-            ->registerService(new PrefabServiceSpecification('application', $this));
     }
 
     /**
@@ -100,7 +97,6 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
     public function run()
     {
         $c = $this->getConsole();
-
         try {
             // init parameters
             $cliParameters = [];
@@ -271,7 +267,7 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
                 }
 
                 /** @var AbstractCliAction $command */
-                $command = new $commandClass;
+                $command = $this->getServicesFactory($commandClass);
 
                 if (!$command instanceof CliActionInterface) {
                     throw new CliException(
