@@ -231,7 +231,7 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
     /**
      * @return array
      */
-    protected function getParameters()
+    public function getParameters() : array
     {
         return [
             CliCommandsPaths::KEY => ['default' => getcwd() . '/app/src/Cli'],
@@ -244,6 +244,7 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
             $this->commands = [new Usage()];
             // load commands
             $commandsPaths = $this->getConfig()->get(CliCommandsPaths::KEY);
+            
             $declaredClasses = get_declared_classes();
             foreach ($commandsPaths as $commandsPath) {
                 $dir = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($commandsPath));
@@ -267,17 +268,9 @@ class AbstractCliApplication extends AbstractApplication implements CliApplicati
                 }
 
                 /** @var AbstractCliAction $command */
-                $command = $this->getServicesFactory($commandClass);
+                $command = $this->getServicesFactory()->get($commandClass);
 
-                if (!$command instanceof CliActionInterface) {
-                    throw new CliException(
-                        sprintf(
-                            'Cannot register command "%s" because it does not implement %s',
-                            get_class($command),
-                            CliActionInterface::class
-                        )
-                    );
-                }
+                if(!$command instanceof CliActionInterface) continue;
 
                 $this->commands[] = $command;
             }

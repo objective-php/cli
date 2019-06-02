@@ -43,9 +43,15 @@ class Usage extends AbstractCliAction
 
         $c->br()->underline('<bold>Objective PHP</bold> Command Line Interface')->br();
         if ($requestedCommand !== 'usage') {
-            if ($requestedCommand) $c->out(sprintf("Unknown command <red>%s</red>. List of available commands:", $requestedCommand));
-            else $c->out(sprintf("<red>No command</red> has been specified. List of available commands:", $requestedCommand));
-        } elseif (!$this->getParam('command')) $c->bold('List of available commands');
+            if ($requestedCommand) {
+                $c->out(sprintf("Unknown command <red>%s</red>. List of available commands:", $requestedCommand));
+            } else {
+                $c->out(sprintf("<red>No command</red> has been specified. List of available commands:",
+                    $requestedCommand));
+            }
+        } elseif (!$this->getParam('command')) {
+            $c->bold('List of available commands');
+        }
 
         $c->br();
 
@@ -56,12 +62,17 @@ class Usage extends AbstractCliAction
             /** @var CliActionInterface $command */
             foreach ($app->findAvailableCommands() as $command) {
 
-                if (!$command instanceof CliActionInterface) continue;
-                if (!is_object($command)) $command = new $command;
+                if (!$command instanceof CliActionInterface) {
+                    continue;
+                }
+                if (!is_object($command)) {
+                    $command = new $command;
+                }
                 $commandLength = strlen($command->getCommand());
                 $maxCommandLength = max($commandLength, $maxCommandLength);
             }
-            $p = $c->padding($maxCommandLength + 15, ' ');
+
+            $p = $c->padding($maxCommandLength + 30)->char(' ');
         }
 
         /** @var CliActionInterface $command */
@@ -70,7 +81,9 @@ class Usage extends AbstractCliAction
                 continue;
             }
 
-            if ($this->getParam('command') && ($this->getParam('command') != $command->getCommand())) continue;
+            if ($this->getParam('command') && ($this->getParam('command') != $command->getCommand())) {
+                continue;
+            }
 
             if ($verbose) {
                 echo $command->getUsage() . PHP_EOL;
