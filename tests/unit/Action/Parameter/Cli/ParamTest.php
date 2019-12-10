@@ -56,12 +56,12 @@ class ParamTest extends TestCase
 
         $param->hydrate(['-t', 'test']);
 
-        $this->assertInternalType('array', $param->getValue());
+        $this->assertIsArray($param->getValue());
         $this->assertEquals(['test'], $param->getValue());
 
         $param->hydrate(['-t', 'test', '-t', 'other']);
 
-        $this->assertInternalType('array', $param->getValue());
+        $this->assertIsArray($param->getValue());
         $this->assertEquals(['test', 'other'], $param->getValue());
 
 
